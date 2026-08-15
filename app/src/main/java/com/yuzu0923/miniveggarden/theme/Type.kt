@@ -1,4 +1,4 @@
-package com.yuzu0923.miniveggarden.ui.theme
+package com.yuzu0923.miniveggarden.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

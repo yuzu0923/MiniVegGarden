@@ -11,20 +11,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.yuzu0923.miniveggarden.ui.theme.MiniVegGardenTheme
+import com.yuzu0923.miniveggarden.theme.MiniVegGardenTheme
+import com.yuzu0923.miniveggarden.ui.HomeScreen
+import com.yuzu0923.miniveggarden.navigation.AppNavigation
+
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen() //アプリが起動するとき、OS標準のスプラッシュ画面を使う
+
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             MiniVegGardenTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNavigation()
             }
         }
     }
