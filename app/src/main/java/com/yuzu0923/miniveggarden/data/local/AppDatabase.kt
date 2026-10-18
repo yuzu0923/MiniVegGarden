@@ -1,5 +1,7 @@
+// アプリが使うデータベースの構造と、データへのアクセス窓口をまとめるクラス
 package com.yuzu0923.miniveggarden.data.local
 
+// import
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
@@ -9,8 +11,9 @@ import androidx.room.RoomDatabase
         VegetableEntity::class,
         WorkRecordEntity::class
         ],
-    version = 1
+    version = 2
 )
+// DAOの取得（Roomがこの宣言をもとに実装を生成）
 abstract class AppDatabase : RoomDatabase(){
     abstract fun fieldDao(): FieldDao
     abstract fun vegetableDao(): VegetableDao

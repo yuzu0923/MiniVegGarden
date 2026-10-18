@@ -1,5 +1,9 @@
+// 野菜を新しく登録するためのダイアログを定義する
 package com.yuzu0923.miniveggarden.ui
 
+// import
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -9,8 +13,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import com.yuzu0923.miniveggarden.data.local.VegetableEntity
 import com.yuzu0923.miniveggarden.viewmodel.VegetableViewModel
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.yuzu0923.miniveggarden.R
 
 @Composable
 fun AddVegetableDialog(
@@ -25,122 +38,139 @@ fun AddVegetableDialog(
         mutableStateOf("")
     }
 
+    // 選択中のアイコン名
+    var selectedIconName by remember { mutableStateOf("tomato") }
+
     var showFullFieldDialog by remember { // 畑が満杯の場合
         mutableStateOf(false)
     }
 
-    AlertDialog(
-        onDismissRequest = {
-            onDismiss()
-        },
-        title = {
-            Text("新規作物登録")
-        },
-        text = {
-            OutlinedTextField(
-                value = vegetableName,
-                onValueChange = {
-                    vegetableName = it
-                    },
-                label = {
-                        Text("作物名")
-                    }
-                )
-        },
-        confirmButton = {
-            TextButton(
-                enabled = vegetableName.isNotBlank(),
-                onClick = {
-                    println("登録する作物：$vegetableName")
+    // アイコン名と画像リソースの対応表
+    val vegetableIcons = listOf(
+        "tomato" to R.drawable.tomato,
+        "carrot" to R.drawable.carrot,
+        "pumpkin" to R.drawable.pumpkin
+    )
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = { Text("新規作物登録") },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = vegetableName,
+                        onValueChange = { vegetableName = it },
+                        label = { Text("作物名") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                    // 最終処理（row,colの確定値にどちらの値を使うか）
-                    var registerRow = row // 確定列
-                    var registerCol = column // 確定行
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("アイコンを選択")
 
-                    if (row != null && column != null) { // 行列の選択情報がある場合
-                        println("登録先：${row + 1}行目・${column + 1}列目")
-                    } else { // 行列の選択情報がない場合（一覧からの新規追加）
+                    // 3種類のアイコンを横並びにする
+                    Row {
+                        vegetableIcons.forEach { (iconName, iconRes) ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+                                        selectedIconName = iconName
+                                    }
+                                    .padding(4.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = iconRes),
+                                    contentDescription = iconName,
+                                    modifier = Modifier.size(56.dp)
+                                )
 
-                        //左上から空いているマスを探して自動選択
-                        var emptyRow: Int? = null
-                        var emptyCol: Int? = null
+                                Text(
+                                    text = when (iconName) {
+                                        "tomato" -> "トマト"
+                                        "carrot" -> "ニンジン"
+                                        "pumpkin" -> "カボチャ"
+                                        else -> iconName
+                                    }
+                                )
 
-                        search@ for (searchRow in 0..4) {
-                            for (searchCol in 0..4) {
-                                val isOccupied = vegetables.any { vegetable ->
-                                    vegetable.row == searchRow && vegetable.col == searchCol
-                                }
-
-                                if (!isOccupied) {
-                                    emptyRow = searchRow
-                                    emptyCol = searchCol
-                                    break@search // searchのタグが付いたfor文を抜け出す
-                                }
+                                RadioButton(
+                                    selected = selectedIconName == iconName,
+                                    onClick = { selectedIconName = iconName }
+                                )
                             }
                         }
-                        registerRow = emptyRow
-                        registerCol = emptyCol
-
-                        if (emptyRow == null || emptyCol == null) {
-                            showFullFieldDialog = true
-                            return@TextButton //このボタンのクリック処理をここで終了する
-                        }
                     }
-
-
-
-                    // row / column → ダイアログに最初から渡された座標
-                    // searchRow / searchCol → 今回の探索で調べている座標
-                    if (registerRow != null && registerCol != null) {
-
-                        val vegetable = VegetableEntity(
-                            vegetableName = vegetableName,
-                            row = registerRow,
-                            col = registerCol,
-                            fieldId = 1
-                        )
-
-                        vegetableViewModel.addVegetable(vegetable)
-
-                        onDismiss()
-                    }
-                },
-            ) {
-                Text("登録")
-            }
-        },
-
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismiss()
                 }
-            ) {
-                Text("閉じる")
-            }
-        }
-    )
-
-    if (showFullFieldDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showFullFieldDialog = false
-            },
-            title = {
-                Text("畑がいっぱいです")
-            },
-            text = {
-                Text("これ以上作物を登録できる空きマスがありません。")
             },
             confirmButton = {
                 TextButton(
+                    enabled = vegetableName.isNotBlank(),
                     onClick = {
-                        showFullFieldDialog = false
+                        var registerRow = row
+                        var registerCol = column
+
+                        // 場所が指定されていない場合、空きマスを探す
+                        if (registerRow == null || registerCol == null) {
+                            val emptyPosition = (0..4).asSequence()
+                                .flatMap { searchRow ->
+                                    (0..4).asSequence().map { searchCol ->
+                                        searchRow to searchCol
+                                    }
+                                }
+                                .firstOrNull { (searchRow, searchCol) ->
+                                    vegetables.none { vegetable ->
+                                        vegetable.row == searchRow &&
+                                                vegetable.col == searchCol
+                                    }
+                                }
+
+                            // 空きマスがなければ警告を表示
+                            if (emptyPosition == null) {
+                                showFullFieldDialog = true
+                                return@TextButton
+                            }
+
+                            registerRow = emptyPosition.first
+                            registerCol = emptyPosition.second
+                        }
+
+                        // 登録する作物を作成
+                        val vegetable = VegetableEntity(
+                            vegetableName = vegetableName.trim(),
+                            row = registerRow,
+                            col = registerCol,
+                            fieldId = 1,
+                            iconName = selectedIconName
+                        )
+
+                        vegetableViewModel.addVegetable(vegetable)
+                        onDismiss()
                     }
                 ) {
-                    Text("OK")
+                    Text("登録")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onDismiss() }) {
+                    Text("閉じる")
                 }
             }
         )
+
+        // 畑が満杯の場合の警告
+        if (showFullFieldDialog) {
+            AlertDialog(
+                onDismissRequest = { showFullFieldDialog = false },
+                title = { Text("畑がいっぱいです") },
+                text = {
+                    Text("これ以上作物を登録できる空きマスがありません。")
+                },
+                confirmButton = {
+                    TextButton(onClick = { showFullFieldDialog = false }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
     }
-}

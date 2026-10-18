@@ -1,9 +1,8 @@
+//画面とデータベースの仲介役
 package com.yuzu0923.miniveggarden.viewmodel
-
+// import
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yuzu0923.miniveggarden.data.local.VegetableDao
-import com.yuzu0923.miniveggarden.data.local.VegetableEntity
 import com.yuzu0923.miniveggarden.data.local.WorkRecordDao
 import com.yuzu0923.miniveggarden.data.local.WorkRecordEntity
 import kotlinx.coroutines.flow.Flow
@@ -44,24 +43,25 @@ class WorkRecordViewModel (
         }
     }
 
+    // 指定した作業IDの作業記録を取得する
     fun getWorkRecordById(recordId: Int): Flow<WorkRecordEntity?> {
         return workRecordDao.getWorkRecordById(recordId)
     }
 
-
+     // 指定した日付の作業記録を取得する
     fun getWorkRecordsByDate(
         workDate: String
     ): Flow<List<WorkRecordEntity>> {
         return workRecordDao.getWorkRecordsByDate(workDate)
     }
-
-
+    // 指定した作物の作業記録を取得する
     fun getWorkRecordsByVegetableId(
         vegetableId: Int
     ): Flow<List<WorkRecordEntity>> {
         return workRecordDao.getWorkRecordsByVegetableId(vegetableId)
     }
 
+    // 指定した作物の作業記録を削除する
     fun deleteWorkRecordsByVegetableId(
         vegetableId: Int
     ) {
@@ -69,6 +69,4 @@ class WorkRecordViewModel (
             workRecordDao.deleteWorkRecordsByVegetableId(vegetableId)
         }
     }
-
-
 }

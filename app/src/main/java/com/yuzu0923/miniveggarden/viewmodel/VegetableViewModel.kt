@@ -1,6 +1,7 @@
+//画面とデータベースの仲介役
 package com.yuzu0923.miniveggarden.viewmodel
 
-//画面とデータベースの間に立つ係
+// import
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yuzu0923.miniveggarden.data.local.VegetableDao
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class VegetableViewModel(
-    private val vegetableDao: VegetableDao //VegetableDao.ktの関数
+    private val vegetableDao: VegetableDao
 ) : ViewModel() {
 
     // クラス変数・クラス定数
@@ -29,6 +30,7 @@ class VegetableViewModel(
         return vegetableDao.getVegetableById(vegetableId)
     }
 
+    // 作物情報を更新する
     fun updateVegetable(vegetable: VegetableEntity) {
         viewModelScope.launch {
             vegetableDao.updateVegetable(vegetable)

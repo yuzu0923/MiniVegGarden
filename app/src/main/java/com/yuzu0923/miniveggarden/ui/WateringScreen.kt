@@ -2,7 +2,14 @@
 package com.yuzu0923.miniveggarden.ui
 
 // import
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
@@ -11,6 +18,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.yuzu0923.miniveggarden.data.local.WorkRecordEntity
 import com.yuzu0923.miniveggarden.viewmodel.VegetableViewModel
@@ -28,35 +38,48 @@ fun WateringScreen(
     val vegetables by vegetableViewModel.vegetables
         .collectAsState(initial = emptyList())
 
-    var selectedVegetableIds = remember {
+    val selectedVegetableIds = remember {
         mutableStateListOf<Int>()
     }
 
     // レイアウト
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Text("水やりする作物")
 
         // 登録済みの作物を一覧で表示する（for文回し）
         vegetables.forEach { vegetable ->
-            // 繰り返し内容
-            Checkbox(
-                checked = selectedVegetableIds.contains(vegetable.vegetableId),
-            onCheckedChange = { checked ->
-                if (checked) {
-                    selectedVegetableIds.add(vegetable.vegetableId) // 選択された作物をリストに格納
-                } else {
-                    selectedVegetableIds.remove(vegetable.vegetableId) // 選択を外した作物をリストから除外
-                }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // 繰り返し内容
+                Checkbox(
+                    checked = selectedVegetableIds.contains(vegetable.vegetableId),
+                    onCheckedChange = { checked ->
+                        if (checked) {
+                            selectedVegetableIds.add(vegetable.vegetableId) // 選択された作物をリストに格納
+                        } else {
+                            selectedVegetableIds.remove(vegetable.vegetableId) // 選択を外した作物をリストから除外
+                        }
+                    }
+                )
+                Text(
+                    text = vegetable.vegetableName,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
-            )
-            Text(vegetable.vegetableName) // チェックボックス脇の作物名表示
         }
 
         // 作業記録をつける
         Button(
             enabled = selectedVegetableIds.isNotEmpty(), //一つ以上チェックがついている場合ボタン押下可
             onClick = {
-                println("選択された作物ID：$selectedVegetableIds")
                 val workRecords = mutableListOf<WorkRecordEntity>()
 
                 // チェックをつけた作物すべてに作業記録「水やり」を登録（for文回し）
@@ -69,14 +92,15 @@ fun WateringScreen(
                         )
                     )
                 }
-                println("作成した作業記録：$workRecords")
+
                 workRecordViewModel.addWorkRecords(workRecords)
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("水やりを記録する")
         }
 
-        // 戻るボタン
+        // 「戻る」ボタン
         Button(
             onClick = {
                 navController.popBackStack()

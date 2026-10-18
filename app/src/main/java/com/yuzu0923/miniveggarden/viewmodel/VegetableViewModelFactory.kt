@@ -1,5 +1,6 @@
+// VegetableViewModelを生成するためのクラス
 package com.yuzu0923.miniveggarden.viewmodel
-
+// import
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.yuzu0923.miniveggarden.data.local.VegetableDao

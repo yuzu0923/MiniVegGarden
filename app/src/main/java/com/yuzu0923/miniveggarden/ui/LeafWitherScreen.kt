@@ -2,7 +2,14 @@
 package com.yuzu0923.miniveggarden.ui
 
 // import
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
@@ -11,6 +18,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.yuzu0923.miniveggarden.data.local.WorkRecordEntity
 import com.yuzu0923.miniveggarden.viewmodel.VegetableViewModel
@@ -27,27 +37,42 @@ fun LeafWitherScreen(
     // 変数・定数の定義
     val vegetables by vegetableViewModel.vegetables
         .collectAsState(initial = emptyList())
-    var selectedVegetableIds = remember {
+
+    val selectedVegetableIds = remember {
         mutableStateListOf<Int>()
     }
 
     // レイアウト
-    Column {
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Text("葉枯れがあった作物")
 
         // 登録済みの作物を一覧で表示する（for文回し）
         vegetables.forEach { vegetable ->
-            Checkbox(
-                checked = selectedVegetableIds.contains(vegetable.vegetableId),
-                onCheckedChange = { checked ->
-                    if (checked) {
-                        selectedVegetableIds.add(vegetable.vegetableId)
-                    } else {
-                        selectedVegetableIds.remove(vegetable.vegetableId)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Checkbox(
+                    checked = selectedVegetableIds.contains(vegetable.vegetableId),
+                    onCheckedChange = { checked ->
+                        if (checked) {
+                            selectedVegetableIds.add(vegetable.vegetableId)
+                        } else {
+                            selectedVegetableIds.remove(vegetable.vegetableId)
+                        }
                     }
-                }
-            )
-            Text(vegetable.vegetableName)
+                )
+                Text(
+                    text = vegetable.vegetableName,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
         }
 
         // 作業記録をつける
@@ -69,12 +94,13 @@ fun LeafWitherScreen(
                 }
                 workRecordViewModel.addWorkRecords(workRecords)
                 navController.popBackStack()
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("葉枯れを記録する")
         }
 
-        // 戻るボタン
+        // 「戻る」ボタン
         Button(
             onClick = {
                 navController.popBackStack()
