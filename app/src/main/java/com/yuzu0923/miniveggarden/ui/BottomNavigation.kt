@@ -34,11 +34,10 @@ fun BottomNavigation(
             selected = currentRoute == "home", //今いる画面がhomeなら、このボタンを選択状態にする
             onClick = {
                 navController.navigate("home") {
-                    popUpTo(navController.graph.startDestinationId) { //ここまで戻れるようにして、それより前の不要な履歴を整理する
-                        saveState = true //画面を切り替えるとき、状態を保存
+                    popUpTo("home") {
+                        inclusive = false
                     }
-                    launchSingleTop = true //同じ画面を何度も開こうとしたとき、履歴を積み重ねない
-                    restoreState = true //保存しておいた状態があれば、戻ってきたときに復元
+                    launchSingleTop = true
                 }
             }, //home画面に移動する
             icon = {
@@ -59,46 +58,15 @@ fun BottomNavigation(
             )
         )
 
-        // 記録画面
-        NavigationBarItem(
-            selected = currentRoute == "record",
-            onClick = {
-                navController.navigate("record") {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "記録"
-                )
-            },
-            label = {
-                Text("記録")
-            },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = GardenGreen,
-                selectedTextColor = GardenGreen,
-                indicatorColor = GardenCream,
-                unselectedIconColor = Color.Gray,
-                unselectedTextColor = Color.Gray
-            )
-        )
-
         // 一覧画面
         NavigationBarItem(
             selected = currentRoute == "list",
             onClick = {
                 navController.navigate("list") {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
+                    popUpTo("home") {
+                        inclusive = false
                     }
                     launchSingleTop = true
-                    restoreState = true
                 }
             },
             icon = {
@@ -119,16 +87,44 @@ fun BottomNavigation(
             )
         )
 
+        // 記録画面
+        NavigationBarItem(
+            selected = currentRoute == "record",
+            onClick = {
+                navController.navigate("record") {
+                    popUpTo("home") {
+                        inclusive = false
+                    }
+                    launchSingleTop = true
+                }
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "記録"
+                )
+            },
+            label = {
+                Text("記録")
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = GardenGreen,
+                selectedTextColor = GardenGreen,
+                indicatorColor = GardenCream,
+                unselectedIconColor = Color.Gray,
+                unselectedTextColor = Color.Gray
+            )
+        )
+
         // 設定画面
         NavigationBarItem(
             selected = currentRoute == "setting",
             onClick = {
                 navController.navigate("setting") {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
+                    popUpTo("home") {
+                        inclusive = false
                     }
                     launchSingleTop = true
-                    restoreState = true
                 }
             },
             icon = {

@@ -165,7 +165,7 @@ fun AppNavigation() {
                         onClick = { navController.navigate("fertilizer") },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("🌱 肥料")
+                        Text("🌱 施肥")
                     }
 
                     Button(
@@ -207,7 +207,7 @@ fun AppNavigation() {
                 )
             }
 
-            // 肥料の記録画面
+            // 施肥の記録画面
             composable("fertilizer") {
                 FertilizerScreen(
                     vegetableViewModel = vegetableViewModel,

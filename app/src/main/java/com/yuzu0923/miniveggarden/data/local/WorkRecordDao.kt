@@ -1,5 +1,6 @@
 // 作業データをデータベースに登録・取得するための処理を定義するインターフェース
 package com.yuzu0923.miniveggarden.data.local
+
 // import
 import androidx.room.Dao
 import androidx.room.Insert

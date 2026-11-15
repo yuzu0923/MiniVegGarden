@@ -30,6 +30,7 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.ui.graphics.Color
 import com.yuzu0923.miniveggarden.theme.GardenCream
 import com.yuzu0923.miniveggarden.theme.GardenGreen
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -43,7 +44,7 @@ fun RecordScreen(
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = today
-            .atStartOfDay(ZoneId.of("Asia/Tokyo"))
+            .atStartOfDay(ZoneOffset.UTC)
             .toInstant()
             .toEpochMilli()
     )
@@ -80,9 +81,9 @@ fun RecordScreen(
 
             headline = {
                 val headlineDate = datePickerState.selectedDateMillis?.let {
-                    Instant.ofEpochMilli(it)
-                        .atZone(ZoneId.of("Asia/Tokyo"))
-                        .toLocalDate()
+                        Instant.ofEpochMilli(it)
+                            .atZone(ZoneOffset.UTC)
+                            .toLocalDate()
                 }
 
                 Text(
@@ -125,7 +126,7 @@ fun RecordScreen(
                 .map { record ->
                     when (record.workType) {
                         "水やり" -> "💧"
-                        "肥料" -> "🌱"
+                        "施肥" -> "🌱"
                         "虫害" -> "🐛"
                         "葉枯れ" -> "🍂"
                         "収穫" -> "🥕"

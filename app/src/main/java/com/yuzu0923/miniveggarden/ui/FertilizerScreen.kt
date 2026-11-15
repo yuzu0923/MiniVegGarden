@@ -1,4 +1,4 @@
-// 肥料記録画面
+// 施肥記録画面
 package com.yuzu0923.miniveggarden.ui
 
 // import
@@ -86,7 +86,7 @@ fun FertilizerScreen(
                     workRecords.add(
                         WorkRecordEntity(
                             vegetableId = vegetableId,
-                            workType = "肥料",
+                            workType = "施肥",
                             workDate = LocalDate.now(
                                 ZoneId.of("Asia/Tokyo")
                             ).toString()
@@ -98,7 +98,7 @@ fun FertilizerScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("肥料を記録する")
+            Text("施肥を記録する")
         }
 
         // 戻るボタン

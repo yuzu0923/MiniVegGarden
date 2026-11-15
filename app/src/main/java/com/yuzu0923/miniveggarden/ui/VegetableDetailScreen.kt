@@ -152,7 +152,7 @@ fun VegetableDetailScreen(
                                 .forEach { record ->
                                     val icon = when (record.workType) {
                                         "水やり" -> "💧"
-                                        "肥料" -> "🌱"
+                                        "施肥" -> "🌱"
                                         "虫害" -> "🐛"
                                         "葉枯れ" -> "🍂"
                                         "収穫" -> "🥕"

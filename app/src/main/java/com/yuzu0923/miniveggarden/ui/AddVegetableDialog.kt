@@ -51,112 +51,111 @@ fun AddVegetableDialog(
         "carrot" to R.drawable.carrot,
         "pumpkin" to R.drawable.pumpkin
     )
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            title = { Text("新規作物登録") },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = vegetableName,
-                        onValueChange = { vegetableName = it },
-                        label = { Text("作物名") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("新規作物登録") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = vegetableName,
+                    onValueChange = { vegetableName = it },
+                    label = { Text("作物名") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("アイコンを選択")
+
+                // 3種類のアイコンを横並びにする
+                Row {
+                    vegetableIcons.forEach { (iconName, iconRes) ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable {
+                                    selectedIconName = iconName
+                                }
+                                .padding(4.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = iconName,
+                                modifier = Modifier.size(56.dp)
+                            )
+
+                            Text(
+                                text = when (iconName) {
+                                    "tomato" -> "トマト"
+                                    "carrot" -> "ニンジン"
+                                    "pumpkin" -> "カボチャ"
+                                    else -> iconName
+                                }
+                            )
+
+                            RadioButton(
+                                selected = selectedIconName == iconName,
+                                onClick = { selectedIconName = iconName }
+                            )
+                        }
+                    }
+                }
+            } },
+        confirmButton = {
+            TextButton(
+                enabled = vegetableName.isNotBlank(),
+                onClick = {
+                    var registerRow = row
+                    var registerCol = column
+
+                    // 場所が指定されていない場合、空きマスを探す
+                    if (registerRow == null || registerCol == null) {
+                        val emptyPosition = (0..4).asSequence()
+                            .flatMap { searchRow ->
+                                (0..4).asSequence().map { searchCol ->
+                                    searchRow to searchCol
+                                }
+                            }
+                            .firstOrNull { (searchRow, searchCol) ->
+                                vegetables.none { vegetable ->
+                                    vegetable.row == searchRow &&
+                                            vegetable.col == searchCol
+                                }
+                            }
+
+                        // 空きマスがなければ警告を表示
+                        if (emptyPosition == null) {
+                            showFullFieldDialog = true
+                            return@TextButton
+                        }
+
+                        registerRow = emptyPosition.first
+                        registerCol = emptyPosition.second
+                    }
+
+                    // 登録する作物を作成
+                    val vegetable = VegetableEntity(
+                        vegetableName = vegetableName.trim(),
+                        row = registerRow,
+                        col = registerCol,
+                        fieldId = 1,
+                        iconName = selectedIconName
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("アイコンを選択")
-
-                    // 3種類のアイコンを横並びにする
-                    Row {
-                        vegetableIcons.forEach { (iconName, iconRes) ->
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable {
-                                        selectedIconName = iconName
-                                    }
-                                    .padding(4.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(id = iconRes),
-                                    contentDescription = iconName,
-                                    modifier = Modifier.size(56.dp)
-                                )
-
-                                Text(
-                                    text = when (iconName) {
-                                        "tomato" -> "トマト"
-                                        "carrot" -> "ニンジン"
-                                        "pumpkin" -> "カボチャ"
-                                        else -> iconName
-                                    }
-                                )
-
-                                RadioButton(
-                                    selected = selectedIconName == iconName,
-                                    onClick = { selectedIconName = iconName }
-                                )
-                            }
-                        }
-                    }
+                    vegetableViewModel.addVegetable(vegetable)
+                    onDismiss()
                 }
-            },
-            confirmButton = {
-                TextButton(
-                    enabled = vegetableName.isNotBlank(),
-                    onClick = {
-                        var registerRow = row
-                        var registerCol = column
-
-                        // 場所が指定されていない場合、空きマスを探す
-                        if (registerRow == null || registerCol == null) {
-                            val emptyPosition = (0..4).asSequence()
-                                .flatMap { searchRow ->
-                                    (0..4).asSequence().map { searchCol ->
-                                        searchRow to searchCol
-                                    }
-                                }
-                                .firstOrNull { (searchRow, searchCol) ->
-                                    vegetables.none { vegetable ->
-                                        vegetable.row == searchRow &&
-                                                vegetable.col == searchCol
-                                    }
-                                }
-
-                            // 空きマスがなければ警告を表示
-                            if (emptyPosition == null) {
-                                showFullFieldDialog = true
-                                return@TextButton
-                            }
-
-                            registerRow = emptyPosition.first
-                            registerCol = emptyPosition.second
-                        }
-
-                        // 登録する作物を作成
-                        val vegetable = VegetableEntity(
-                            vegetableName = vegetableName.trim(),
-                            row = registerRow,
-                            col = registerCol,
-                            fieldId = 1,
-                            iconName = selectedIconName
-                        )
-
-                        vegetableViewModel.addVegetable(vegetable)
-                        onDismiss()
-                    }
-                ) {
-                    Text("登録")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onDismiss() }) {
-                    Text("閉じる")
-                }
+            ) {
+                Text("登録")
+            } },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text("閉じる")
             }
-        )
+        }
+    )
 
         // 畑が満杯の場合の警告
         if (showFullFieldDialog) {
